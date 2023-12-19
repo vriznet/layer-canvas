@@ -10,10 +10,24 @@ const initialState: LayerDataState = {
   layers: [
     {
       id: 1,
-      x: 0,
-      y: 0,
-      width: 100,
-      height: 100,
+      x: 30,
+      y: 50,
+      width: 80,
+      height: 60,
+    },
+    {
+      id: 2,
+      x: 60,
+      y: 70,
+      width: 40,
+      height: 80,
+    },
+    {
+      id: 3,
+      x: 80,
+      y: 90,
+      width: 90,
+      height: 90,
     },
   ],
 };
