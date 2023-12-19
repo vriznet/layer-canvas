@@ -1,28 +1,21 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { GlobalStyles } from './components/GlobalStyles';
-import { decrement, increment, selectCount } from './redux/module/counterSlice';
+import { selectLayers } from './redux/module/layerDataSlice';
 
 const App = () => {
-  const dispatch = useDispatch();
-  const counterValue = useSelector(selectCount);
-
-  const onIncrement = () => {
-    dispatch(increment());
-  };
-
-  const onDecrement = () => {
-    dispatch(decrement());
-  };
+  const layers = useSelector(selectLayers);
 
   return (
     <>
       <GlobalStyles />
-      <div>
-        <h1>Basic Counter with Redux</h1>
-        <div>{counterValue}</div>
-        <button onClick={onDecrement}>-</button>
-        <button onClick={onIncrement}>+</button>
-      </div>
+      <ul>
+        {layers.map((layer) => (
+          <li key={layer.id}>
+            x: {layer.x}, y: {layer.y}, width: {layer.width}, height:{' '}
+            {layer.height}
+          </li>
+        ))}
+      </ul>
     </>
   );
 };

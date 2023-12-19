@@ -1,8 +1,8 @@
 import { combineReducers } from '@reduxjs/toolkit';
-import counterReducer from './counterSlice';
+import layerDataReducer from './layerDataSlice';
 
 export const rootReducer = combineReducers({
-  counter: counterReducer,
+  layerData: layerDataReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
