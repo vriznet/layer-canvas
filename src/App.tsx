@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux';
 import { GlobalStyles } from './components/GlobalStyles';
 import { selectLayers } from './redux/module/layerDataSlice';
 import styled from 'styled-components';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface ILayerCanvasContainerSCProps {
   $x: number;
@@ -25,12 +25,11 @@ const CanvasArea = styled.div`
 const LayerCanvasContainer = styled.div<ILayerCanvasContainerSCProps>`
   position: absolute;
   background-color: #fff;
-  border: 2px solid #000;
-  box-sizing: content-box;
   top: ${(props) => props.$y}px;
   left: ${(props) => props.$x}px;
   width: ${(props) => props.$width}px;
   height: ${(props) => props.$height}px;
+  z-index: 0;
 `;
 
 const LayerCanvasSC = styled.canvas<ILayerCanvasSCProps>`
@@ -50,56 +49,57 @@ const App = () => {
 
   const layers = useSelector(selectLayers);
 
+  const layerCanvasContainerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const layerIdOne = layers.find((layer) => layer.id === 1);
-    if (layerIdOne) {
-      const canvasIdOne = document.getElementById(
-        `layer-canvas-${layerIdOne.id}`
-      ) as HTMLCanvasElement;
-      const ctx = canvasIdOne.getContext('2d');
-      if (ctx) {
-        ctx.fillStyle = 'red';
-        ctx.fillRect(
-          layerIdOne.x,
-          layerIdOne.y,
-          layerIdOne.width,
-          layerIdOne.height
-        );
-      }
+    const layerCanvasContainer = layerCanvasContainerRef.current;
+    if (layerCanvasContainer) {
+      const { width, height, x, y } =
+        layerCanvasContainer.getBoundingClientRect();
+      setLayerCanvasContainerWidth(width);
+      setLayerCanvasContainerHeight(height);
+      setLayerCanvasContainerX(x);
+      setLayerCanvasContainerY(y);
     }
-    const layerIdTwo = layers.find((layer) => layer.id === 2);
-    if (layerIdTwo) {
-      const canvasIdTwo = document.getElementById(
-        `layer-canvas-${layerIdTwo.id}`
+  }, []);
+
+  useEffect(() => {
+    const getRandomColor = () => {
+      const colors = [
+        'red',
+        'green',
+        'blue',
+        'orange',
+        'purple',
+        'violet',
+        'gray',
+        'black',
+        'turquoise',
+        'skyblue',
+        'navy',
+      ];
+      const randomIndex = Math.floor(Math.random() * colors.length);
+      return colors[randomIndex];
+    };
+
+    layers.forEach((layer) => {
+      const canvas = document.getElementById(
+        `layer-canvas-${layer.id}`
       ) as HTMLCanvasElement;
-      const ctx = canvasIdTwo.getContext('2d');
+      const ctx = canvas.getContext('2d');
+
       if (ctx) {
-        ctx.fillStyle = 'blue';
-        ctx.fillRect(
-          layerIdTwo.x,
-          layerIdTwo.y,
-          layerIdTwo.width,
-          layerIdTwo.height
-        );
+        ctx.fillStyle = getRandomColor();
+        ctx.fillRect(layer.x, layer.y, layer.width, layer.height);
       }
-    }
-    const layerIdThree = layers.find((layer) => layer.id === 3);
-    if (layerIdThree) {
-      const canvasIdThree = document.getElementById(
-        `layer-canvas-${layerIdThree.id}`
-      ) as HTMLCanvasElement;
-      const ctx = canvasIdThree.getContext('2d');
-      if (ctx) {
-        ctx.fillStyle = 'green';
-        ctx.fillRect(
-          layerIdThree.x,
-          layerIdThree.y,
-          layerIdThree.width,
-          layerIdThree.height
-        );
-      }
-    }
-  }, [layers]);
+    });
+  }, [
+    layers,
+    layerCanvasContainerWidth,
+    layerCanvasContainerHeight,
+    layerCanvasContainerX,
+    layerCanvasContainerY,
+  ]);
 
   return (
     <>
@@ -110,12 +110,15 @@ const App = () => {
           $y={layerCanvasContainerY}
           $width={layerCanvasContainerWidth}
           $height={layerCanvasContainerHeight}
+          ref={layerCanvasContainerRef}
         >
           {layers.map((layer) => (
             <LayerCanvasSC
               key={layer.id}
               id={`layer-canvas-${layer.id}`}
               $zIndex={layers.findIndex((l) => l.id === layer.id) + 1}
+              width={layerCanvasContainerWidth}
+              height={layerCanvasContainerHeight}
             ></LayerCanvasSC>
           ))}
         </LayerCanvasContainer>
