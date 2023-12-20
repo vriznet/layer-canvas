@@ -3,6 +3,7 @@ import { GlobalStyles } from './components/GlobalStyles';
 import { selectLayers } from './redux/module/layerDataSlice';
 import styled from 'styled-components';
 import { useEffect, useRef, useState } from 'react';
+import { loadImage } from './utils';
 
 interface ILayerCanvasContainerSCProps {
   $x: number;
@@ -47,6 +48,8 @@ const App = () => {
   const [layerCanvasContainerX, setLayerCanvasContainerX] = useState(10);
   const [layerCanvasContainerY, setLayerCanvasContainerY] = useState(10);
 
+  const [isImagesLoading, setIsImagesLoading] = useState(false);
+
   const layers = useSelector(selectLayers);
 
   const layerCanvasContainerRef = useRef<HTMLDivElement>(null);
@@ -64,30 +67,35 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    layers.forEach((layer) => {
-      const canvas = document.getElementById(
-        `layer-canvas-${layer.id}`
-      ) as HTMLCanvasElement;
-      const ctx = canvas.getContext('2d');
-      const image = new Image();
-      image.addEventListener('load', () => {
-        if (ctx) {
-          ctx.drawImage(image, layer.x, layer.y);
-        }
-      });
-      image.src = `https://picsum.photos/${layer.width}/${layer.height}?random=${layer.id}`;
-    });
-  }, [
-    layers,
-    layerCanvasContainerWidth,
-    layerCanvasContainerHeight,
-    layerCanvasContainerX,
-    layerCanvasContainerY,
-  ]);
+    const startLoad = async () => {
+      setIsImagesLoading(true);
+      const imageUrls = layers.map(
+        (layer) =>
+          `https://picsum.photos/${layer.width}/${layer.height}?random=${layer.id}`
+      );
+      const images = await Promise.all(imageUrls.map(loadImage));
+      setIsImagesLoading(false);
+      if (images.length > 0) {
+        layers.forEach((layer, index) => {
+          const canvas = document.getElementById(
+            `layer-canvas-${layer.id}`
+          ) as HTMLCanvasElement;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(images[index], layer.x, layer.y);
+          }
+        });
+      }
+    };
+    startLoad();
+  }, [layers]);
 
   return (
     <>
       <GlobalStyles />
+      <div>
+        {isImagesLoading ? <p>Loading...</p> : <p>Images are loaded</p>}
+      </div>
       <CanvasArea>
         <LayerCanvasContainer
           $x={layerCanvasContainerX}
