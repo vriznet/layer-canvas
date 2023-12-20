@@ -64,24 +64,6 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const getRandomColor = () => {
-      const colors = [
-        'red',
-        'green',
-        'blue',
-        'orange',
-        'purple',
-        'violet',
-        'gray',
-        'black',
-        'turquoise',
-        'skyblue',
-        'navy',
-      ];
-      const randomIndex = Math.floor(Math.random() * colors.length);
-      return colors[randomIndex];
-    };
-
     layers.forEach((layer) => {
       const canvas = document.getElementById(
         `layer-canvas-${layer.id}`
