@@ -87,11 +87,13 @@ const App = () => {
         `layer-canvas-${layer.id}`
       ) as HTMLCanvasElement;
       const ctx = canvas.getContext('2d');
-
-      if (ctx) {
-        ctx.fillStyle = getRandomColor();
-        ctx.fillRect(layer.x, layer.y, layer.width, layer.height);
-      }
+      const image = new Image();
+      image.addEventListener('load', () => {
+        if (ctx) {
+          ctx.drawImage(image, layer.x, layer.y);
+        }
+      });
+      image.src = `https://picsum.photos/${layer.width}/${layer.height}?random=${layer.id}`;
     });
   }, [
     layers,
