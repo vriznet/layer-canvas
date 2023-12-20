@@ -4,4 +4,5 @@ export type PsLayer = {
   y: number;
   width: number;
   height: number;
+  imageURL?: string;
 };

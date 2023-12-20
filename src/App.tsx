@@ -15,6 +15,11 @@ interface ILayerCanvasSCProps {
   $zIndex: number;
 }
 
+type ImageURLAndLayerId = {
+  imageURL: string;
+  layerId: number;
+};
+
 const CanvasArea = styled.div`
   position: relative;
   width: 100vw;
@@ -67,27 +72,52 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const startLoad = async () => {
+    const loadAndRender = async () => {
       setIsImagesLoading(true);
-      const imageUrls = layers.map(
-        (layer) =>
-          `https://picsum.photos/${layer.width}/${layer.height}?random=${layer.id}`
+      const imageURLsAndLayerIds: ImageURLAndLayerId[] = [];
+      const noImageLayers = layers.filter((layer) => !layer.imageURL);
+      for (let i = 0; i < layers.length; i++) {
+        const layer = layers[i];
+        if (layer.imageURL) {
+          imageURLsAndLayerIds.push({
+            imageURL: layer.imageURL,
+            layerId: layer.id,
+          });
+        }
+      }
+      const images = await Promise.all(
+        imageURLsAndLayerIds.map(({ imageURL }) => loadImage(imageURL))
       );
-      const images = await Promise.all(imageUrls.map(loadImage));
       setIsImagesLoading(false);
-      if (images.length > 0) {
-        layers.forEach((layer, index) => {
+      imageURLsAndLayerIds.forEach((imageURLAndLayerId) => {
+        const { imageURL, layerId } = imageURLAndLayerId;
+        const layer = layers.find((l) => l.id === layerId);
+        if (layer) {
           const canvas = document.getElementById(
             `layer-canvas-${layer.id}`
           ) as HTMLCanvasElement;
           const ctx = canvas.getContext('2d');
           if (ctx) {
-            ctx.drawImage(images[index], layer.x, layer.y);
+            ctx.drawImage(
+              images.find((image) => image.src === imageURL)!,
+              layer.x,
+              layer.y
+            );
           }
-        });
-      }
+        }
+      });
+      noImageLayers.forEach((layer) => {
+        const canvas = document.getElementById(
+          `layer-canvas-${layer.id}`
+        ) as HTMLCanvasElement;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = 'red';
+          ctx.fillRect(layer.x, layer.y, layer.width, layer.height);
+        }
+      });
     };
-    startLoad();
+    loadAndRender();
   }, [layers]);
 
   return (
