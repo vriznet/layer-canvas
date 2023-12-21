@@ -3,6 +3,7 @@ import { GlobalStyles } from './components/GlobalStyles';
 import {
   addOneLayer,
   changeLayerData,
+  selectLastLayerId,
   selectLayers,
   setLayers,
 } from './redux/module/layerDataSlice';
@@ -56,11 +57,12 @@ const App = () => {
 
   const dispatch = useDispatch();
   const layers = useSelector(selectLayers);
+  const lastLayerId = useSelector(selectLastLayerId);
 
   const layerCanvasContainerRef = useRef<HTMLDivElement>(null);
 
   const onNewEmptyLayerButtonClick = () => {
-    const layerId = layers.length + 1;
+    const layerId = lastLayerId + 1;
     dispatch(
       addOneLayer({
         layer: createEmptyLayerData(layerId),
@@ -70,7 +72,7 @@ const App = () => {
   };
 
   const onNewRectShapeLayerButtonClick = () => {
-    const layerId = layers.length + 1;
+    const layerId = lastLayerId + 1;
     dispatch(
       addOneLayer({
         layer: createEmptyLayerData(layerId),
@@ -89,7 +91,7 @@ const App = () => {
   };
 
   const onNewImageLayerButtonClick = () => {
-    const layerId = layers.length + 1;
+    const layerId = lastLayerId + 1;
     dispatch(
       addOneLayer({
         layer: createEmptyLayerData(layerId),
