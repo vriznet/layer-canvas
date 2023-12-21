@@ -5,10 +5,12 @@ import { initialLayers } from '../../data/layerData';
 
 export interface LayerDataState {
   layers: PsLayer[];
+  lastLayerId: number;
 }
 
 const initialState: LayerDataState = {
   layers: initialLayers,
+  lastLayerId: initialLayers.length,
 };
 
 export const layerDataSlice = createSlice({
@@ -17,6 +19,9 @@ export const layerDataSlice = createSlice({
   reducers: {
     setLayers: (state, action: PayloadAction<PsLayer[]>) => {
       state.layers = action.payload;
+    },
+    setLastLayerId: (state, action: PayloadAction<number>) => {
+      state.lastLayerId = action.payload;
     },
     addOneLayer: (
       state,
@@ -69,6 +74,7 @@ export const layerDataSlice = createSlice({
 
 export const {
   setLayers,
+  setLastLayerId,
   addOneLayer,
   changeLayerData,
   deleteOneLayer,
@@ -79,5 +85,7 @@ export const {
 export const selectOneLayer = (state: RootState, id: number) =>
   state.layerData.layers.find((layer) => layer.id === id);
 export const selectLayers = (state: RootState) => state.layerData.layers;
+export const selectLastLayerId = (state: RootState) =>
+  state.layerData.lastLayerId;
 
 export default layerDataSlice.reducer;
