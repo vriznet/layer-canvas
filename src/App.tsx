@@ -122,7 +122,10 @@ const App = () => {
   };
 
   const onDeleteTopLayerButtonClick = () => {
-    dispatch(deleteOneLayer(layers.length));
+    const topLayer = layers[layers.length - 1];
+    if (topLayer) {
+      dispatch(deleteOneLayer(topLayer.id));
+    }
   };
 
   const onDeleteIdOneAndTwoLayersButtonClick = () => {
