@@ -61,6 +61,9 @@ export const layerDataSlice = createSlice({
         (layer) => !action.payload.includes(layer.id)
       );
     },
+    deleteAllLayers: (state) => {
+      state.layers = [];
+    },
   },
 });
 
@@ -70,6 +73,7 @@ export const {
   changeLayerData,
   deleteOneLayer,
   deleteLayers,
+  deleteAllLayers,
 } = layerDataSlice.actions;
 
 export const selectOneLayer = (state: RootState, id: number) =>

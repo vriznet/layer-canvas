@@ -3,6 +3,7 @@ import { GlobalStyles } from './components/GlobalStyles';
 import {
   addOneLayer,
   changeLayerData,
+  deleteAllLayers,
   deleteLayers,
   deleteOneLayer,
   selectLayers,
@@ -122,6 +123,10 @@ const App = () => {
     dispatch(deleteLayers([1, 2]));
   };
 
+  const onDeleteAllLayersButtonClick = () => {
+    dispatch(deleteAllLayers());
+  };
+
   useEffect(() => {
     const loadAndRender = async () => {
       setIsImagesLoading(true);
@@ -210,6 +215,7 @@ const App = () => {
       <button onClick={onDeleteIdOneAndTwoLayersButtonClick}>
         Delete layers with ids 1 and 2
       </button>
+      <button onClick={onDeleteAllLayersButtonClick}>Delete all layers</button>
     </>
   );
 };
