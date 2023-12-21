@@ -88,6 +88,26 @@ const App = () => {
     );
   };
 
+  const onNewImageLayerButtonClick = () => {
+    const layerId = layers.length + 1;
+    dispatch(
+      addOneLayer({
+        layer: createEmptyLayerData(layerId),
+        targetIndex: layers.length,
+      })
+    );
+    dispatch(
+      changeLayerData({
+        id: layerId,
+        x: Math.floor(Math.random() * 300),
+        y: Math.floor(Math.random() * 200),
+        width: 30,
+        height: 20,
+        imageURL: `https://picsum.photos/30/20?random=${layerId}`,
+      })
+    );
+  };
+
   const onResetToDefaultLayersButtonClick = () => {
     dispatch(setLayers(initialLayers));
   };
@@ -172,6 +192,7 @@ const App = () => {
       <button onClick={onNewRectShapeLayerButtonClick}>
         New rect shape layer
       </button>
+      <button onClick={onNewImageLayerButtonClick}>New image layer</button>
       <button onClick={onResetToDefaultLayersButtonClick}>
         Reset to default layers
       </button>
