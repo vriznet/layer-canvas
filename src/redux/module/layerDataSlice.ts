@@ -31,32 +31,34 @@ export const layerDataSlice = createSlice({
         action.payload.layer
       );
     },
-    changeLayerAppearance: (
+    changeLayerData: (
       state,
       action: PayloadAction<{
         id: number;
-        x: number;
-        y: number;
-        width: number;
-        height: number;
+        x?: number;
+        y?: number;
+        width?: number;
+        height?: number;
+        imageURL?: string;
       }>
     ) => {
-      const { id, x, y } = action.payload;
+      const { id, x, y, width, height, imageURL } = action.payload;
       const targetLayer = state.layers.find((layer) => layer.id === id);
-      if (targetLayer) {
-        targetLayer.x = x;
-        targetLayer.y = y;
-      }
+      if (!targetLayer) return console.error('no layer found');
+      targetLayer.x = x || targetLayer.x;
+      targetLayer.y = y || targetLayer.y;
+      targetLayer.width = width || targetLayer.width;
+      targetLayer.height = height || targetLayer.height;
+      targetLayer.imageURL = imageURL || targetLayer.imageURL;
     },
   },
 });
 
-export const { setLayers, addOneLayer, changeLayerAppearance } =
+export const { setLayers, addOneLayer, changeLayerData } =
   layerDataSlice.actions;
 
-export const selectOneLayer = (state: RootState, id: number) => {
-  return state.layerData.layers.find((layer) => layer.id === id);
-};
+export const selectOneLayer = (state: RootState, id: number) =>
+  state.layerData.layers.find((layer) => layer.id === id);
 export const selectLayers = (state: RootState) => state.layerData.layers;
 
 export default layerDataSlice.reducer;

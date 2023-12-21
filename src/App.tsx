@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { GlobalStyles } from './components/GlobalStyles';
 import {
   addOneLayer,
+  changeLayerData,
   selectLayers,
   setLayers,
 } from './redux/module/layerDataSlice';
@@ -59,10 +60,30 @@ const App = () => {
   const layerCanvasContainerRef = useRef<HTMLDivElement>(null);
 
   const onNewEmptyLayerButtonClick = () => {
+    const layerId = layers.length + 1;
     dispatch(
       addOneLayer({
-        layer: createEmptyLayerData(layers.length),
+        layer: createEmptyLayerData(layerId),
         targetIndex: layers.length,
+      })
+    );
+  };
+
+  const onNewRectShapeLayerButtonClick = () => {
+    const layerId = layers.length + 1;
+    dispatch(
+      addOneLayer({
+        layer: createEmptyLayerData(layerId),
+        targetIndex: layers.length,
+      })
+    );
+    dispatch(
+      changeLayerData({
+        id: layerId,
+        x: Math.floor(Math.random() * 300),
+        y: Math.floor(Math.random() * 200),
+        width: Math.floor(Math.random() * 300),
+        height: Math.floor(Math.random() * 200),
       })
     );
   };
@@ -148,6 +169,9 @@ const App = () => {
         </LayerCanvasContainer>
       </CanvasArea>
       <button onClick={onNewEmptyLayerButtonClick}>New empty layer</button>
+      <button onClick={onNewRectShapeLayerButtonClick}>
+        New rect shape layer
+      </button>
       <button onClick={onResetToDefaultLayersButtonClick}>
         Reset to default layers
       </button>

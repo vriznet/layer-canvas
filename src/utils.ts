@@ -13,9 +13,9 @@ export const loadImage = (url: string): Promise<HTMLImageElement> => {
   });
 };
 
-export const createEmptyLayerData = (lastLayerId: number): PsLayer => {
+export const createEmptyLayerData = (layerId: number): PsLayer => {
   return {
-    id: lastLayerId + 1,
+    id: layerId,
     x: 0,
     y: 0,
     width: 0,
@@ -30,15 +30,4 @@ export const getRandomColorString = (): string => {
     colorString += letters[Math.floor(Math.random() * 16)];
   }
   return colorString;
-};
-
-export const drawRandomColorRect = (
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number
-): void => {
-  ctx.fillStyle = getRandomColorString();
-  ctx.fillRect(x, y, width, height);
 };
