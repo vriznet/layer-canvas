@@ -56,11 +56,31 @@ export const layerDataSlice = createSlice({
       targetLayer.height = height || targetLayer.height;
       targetLayer.imageURL = imageURL || targetLayer.imageURL;
     },
+    deleteOneLayer: (state, action: PayloadAction<number>) => {
+      state.layers = state.layers.filter(
+        (layer) => layer.id !== action.payload
+      );
+    },
+    deleteLayers: (state, action: PayloadAction<number[]>) => {
+      state.layers = state.layers.filter(
+        (layer) => !action.payload.includes(layer.id)
+      );
+    },
+    deleteAllLayers: (state) => {
+      state.layers = [];
+    },
   },
 });
 
-export const { setLayers, setLastLayerId, addOneLayer, changeLayerData } =
-  layerDataSlice.actions;
+export const {
+  setLayers,
+  setLastLayerId,
+  addOneLayer,
+  changeLayerData,
+  deleteOneLayer,
+  deleteLayers,
+  deleteAllLayers,
+} = layerDataSlice.actions;
 
 export const selectOneLayer = (state: RootState, id: number) =>
   state.layerData.layers.find((layer) => layer.id === id);

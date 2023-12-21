@@ -4,6 +4,9 @@ import {
   addOneLayer,
   changeLayerData,
   selectLastLayerId,
+  deleteAllLayers,
+  deleteLayers,
+  deleteOneLayer,
   selectLayers,
   setLastLayerId,
   setLayers,
@@ -118,6 +121,18 @@ const App = () => {
     dispatch(setLayers(initialLayers));
   };
 
+  const onDeleteTopLayerButtonClick = () => {
+    dispatch(deleteOneLayer(layers.length));
+  };
+
+  const onDeleteIdOneAndTwoLayersButtonClick = () => {
+    dispatch(deleteLayers([1, 2]));
+  };
+
+  const onDeleteAllLayersButtonClick = () => {
+    dispatch(deleteAllLayers());
+  };
+
   useEffect(() => {
     const loadAndRender = async () => {
       setIsImagesLoading(true);
@@ -202,6 +217,11 @@ const App = () => {
       <button onClick={onResetToDefaultLayersButtonClick}>
         Reset to default layers
       </button>
+      <button onClick={onDeleteTopLayerButtonClick}>Delete top layer</button>
+      <button onClick={onDeleteIdOneAndTwoLayersButtonClick}>
+        Delete layers with ids 1 and 2
+      </button>
+      <button onClick={onDeleteAllLayersButtonClick}>Delete all layers</button>
     </>
   );
 };
