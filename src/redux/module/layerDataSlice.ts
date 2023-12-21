@@ -56,11 +56,21 @@ export const layerDataSlice = createSlice({
         (layer) => layer.id !== action.payload
       );
     },
+    deleteLayers: (state, action: PayloadAction<number[]>) => {
+      state.layers = state.layers.filter(
+        (layer) => !action.payload.includes(layer.id)
+      );
+    },
   },
 });
 
-export const { setLayers, addOneLayer, changeLayerData, deleteOneLayer } =
-  layerDataSlice.actions;
+export const {
+  setLayers,
+  addOneLayer,
+  changeLayerData,
+  deleteOneLayer,
+  deleteLayers,
+} = layerDataSlice.actions;
 
 export const selectOneLayer = (state: RootState, id: number) =>
   state.layerData.layers.find((layer) => layer.id === id);
