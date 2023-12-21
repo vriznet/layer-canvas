@@ -18,8 +18,18 @@ export const layerDataSlice = createSlice({
     setLayers: (state, action: PayloadAction<PsLayer[]>) => {
       state.layers = action.payload;
     },
-    addOneLayer: (state, action: PayloadAction<PsLayer>) => {
-      state.layers.push(action.payload);
+    addOneLayer: (
+      state,
+      action: PayloadAction<{
+        layer: PsLayer;
+        targetIndex?: number;
+      }>
+    ) => {
+      state.layers.splice(
+        action.payload.targetIndex || state.layers.length,
+        0,
+        action.payload.layer
+      );
     },
     changeLayerAppearance: (
       state,

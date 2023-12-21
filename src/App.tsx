@@ -59,7 +59,12 @@ const App = () => {
   const layerCanvasContainerRef = useRef<HTMLDivElement>(null);
 
   const onNewEmptyLayerButtonClick = () => {
-    dispatch(addOneLayer(createEmptyLayerData(layers.length)));
+    dispatch(
+      addOneLayer({
+        layer: createEmptyLayerData(layers.length),
+        targetIndex: layers.length,
+      })
+    );
   };
 
   const onResetToDefaultLayersButtonClick = () => {
