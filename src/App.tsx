@@ -1,3 +1,4 @@
+// #region : imports
 import { useDispatch, useSelector } from 'react-redux';
 import { GlobalStyles } from './components/GlobalStyles';
 import {
@@ -12,10 +13,14 @@ import {
   setLayers,
 } from './redux/module/layerDataSlice';
 import styled from 'styled-components';
-import { useEffect, useRef, useState } from 'react';
+import { PointerEventHandler, useEffect, useRef, useState } from 'react';
 import { createEmptyLayerData, getRandomColorString, loadImage } from './utils';
 import { initialLayers } from './data/layerData';
+import { Appearance } from './types/common';
+import { baseAppearance } from './data/common';
+// #endregion : imports
 
+// #region : types
 interface ILayerCanvasContainerSCProps {
   $x: number;
   $y: number;
@@ -26,17 +31,28 @@ interface ILayerCanvasSCProps {
   $zIndex: number;
 }
 
+interface IRectBlueprintSCProps {
+  $x: number;
+  $y: number;
+  $width: number;
+  $height: number;
+  $zIndex: number;
+}
+
 type ImageURLAndLayerId = {
   imageURL: string;
   layerId: number;
 };
+// #endregion : types
 
+// #region : styled components
 const CanvasArea = styled.div`
   position: relative;
   width: 100%;
   height: 240px;
   background-color: #333;
   overflow: hidden;
+  touch-action: none;
 `;
 
 const LayerCanvasContainer = styled.div<ILayerCanvasContainerSCProps>`
@@ -56,14 +72,88 @@ const LayerCanvasSC = styled.canvas<ILayerCanvasSCProps>`
   z-index: ${(props) => props.$zIndex};
 `;
 
+const RectBlueprintSC = styled.div.attrs<IRectBlueprintSCProps>((props) => ({
+  style: {
+    top: props.$height < 0 ? props.$y + props.$height : props.$y,
+    left: props.$width < 0 ? props.$x + props.$width : props.$x,
+    width: Math.abs(props.$width),
+    height: Math.abs(props.$height),
+    zIndex: props.$zIndex,
+  },
+}))<IRectBlueprintSCProps>`
+  position: absolute;
+  background-color: transparent;
+  border: 1px solid #37f;
+`;
+// #endregion : styled components
+
 const App = () => {
+  // #region : states
   const [isImagesLoading, setIsImagesLoading] = useState(false);
 
+  const [rectBluePrintAppearance, setRectBluePrintAppearance] =
+    useState<Appearance>(baseAppearance);
+  // #endregion : states
+
+  // #region : redux
   const dispatch = useDispatch();
+
   const layers = useSelector(selectLayers);
   const lastLayerId = useSelector(selectLastLayerId);
+  // #endregion : redux
 
+  // #region : refs
   const layerCanvasContainerRef = useRef<HTMLDivElement>(null);
+  // #endregion : refs
+
+  // #region : handlers
+  const onCanvasAreaPointerDown: PointerEventHandler = (event) => {
+    event.preventDefault();
+    const pointedCoords = {
+      x: event.clientX,
+      y: event.clientY,
+    };
+    const pointerMoveHandler = (event: PointerEvent) => {
+      const deltaX = event.clientX - pointedCoords.x;
+      const deltaY = event.clientY - pointedCoords.y;
+      setRectBluePrintAppearance({
+        x: pointedCoords.x,
+        y: pointedCoords.y,
+        width: deltaX,
+        height: deltaY,
+        zIndex: 9999,
+      });
+    };
+    const pointerUpHandler = (event: PointerEvent) => {
+      const deltaX = event.clientX - pointedCoords.x;
+      const deltaY = event.clientY - pointedCoords.y;
+      const newLayerId = lastLayerId + 1;
+      dispatch(
+        addOneLayer({
+          layer: createEmptyLayerData(newLayerId),
+          targetIndex: layers.length,
+        })
+      );
+      dispatch(setLastLayerId(newLayerId));
+      const layerCanvasContainerBoundingRect =
+        layerCanvasContainerRef.current!.getBoundingClientRect();
+      dispatch(
+        changeLayerData({
+          id: newLayerId,
+          x: pointedCoords.x - layerCanvasContainerBoundingRect.left,
+          y: pointedCoords.y - layerCanvasContainerBoundingRect.top,
+          width: deltaX,
+          height: deltaY,
+        })
+      );
+      setRectBluePrintAppearance(baseAppearance);
+      document.removeEventListener('pointermove', pointerMoveHandler);
+    };
+    document.addEventListener('pointermove', pointerMoveHandler);
+    document.addEventListener('pointerup', pointerUpHandler, {
+      once: true,
+    });
+  };
 
   const onNewEmptyLayerButtonClick = () => {
     const layerId = lastLayerId + 1;
@@ -135,13 +225,15 @@ const App = () => {
   const onDeleteAllLayersButtonClick = () => {
     dispatch(deleteAllLayers());
   };
+  // #endregion : handlers
 
+  // #region : effects
   useEffect(() => {
     const loadAndRender = async () => {
-      setIsImagesLoading(true);
-      const imageURLsAndLayerIds: ImageURLAndLayerId[] = [];
+      /* setIsImagesLoading(true);
+      const imageURLsAndLayerIds: ImageURLAndLayerId[] = []; */
       const noImageLayers = layers.filter((layer) => !layer.imageURL);
-      for (let i = 0; i < layers.length; i++) {
+      /* for (let i = 0; i < layers.length; i++) {
         const layer = layers[i];
         if (layer.imageURL) {
           imageURLsAndLayerIds.push({
@@ -149,8 +241,8 @@ const App = () => {
             layerId: layer.id,
           });
         }
-      }
-      const images = await Promise.all(
+      } */
+      /* const images = await Promise.all(
         imageURLsAndLayerIds.map(({ imageURL }) => loadImage(imageURL))
       );
       setIsImagesLoading(false);
@@ -170,7 +262,7 @@ const App = () => {
             );
           }
         }
-      });
+      }); */
       noImageLayers.forEach((layer) => {
         if (layer.width && layer.height) {
           const canvas = document.getElementById(
@@ -186,6 +278,7 @@ const App = () => {
     };
     loadAndRender();
   }, [layers]);
+  // #endregion : effects
 
   return (
     <>
@@ -193,7 +286,7 @@ const App = () => {
       <div>
         {isImagesLoading ? <p>Loading...</p> : <p>Images are loaded</p>}
       </div>
-      <CanvasArea>
+      <CanvasArea onPointerDown={onCanvasAreaPointerDown}>
         <LayerCanvasContainer
           $x={20}
           $y={20}
@@ -225,6 +318,13 @@ const App = () => {
         Delete layers with ids 1 and 2
       </button>
       <button onClick={onDeleteAllLayersButtonClick}>Delete all layers</button>
+      <RectBlueprintSC
+        $x={rectBluePrintAppearance.x}
+        $y={rectBluePrintAppearance.y}
+        $width={rectBluePrintAppearance.width}
+        $height={rectBluePrintAppearance.height}
+        $zIndex={rectBluePrintAppearance.zIndex}
+      ></RectBlueprintSC>
     </>
   );
 };
