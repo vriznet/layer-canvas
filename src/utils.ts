@@ -31,3 +31,14 @@ export const getRandomColorString = (): string => {
   }
   return colorString;
 };
+
+export const drawRandomColorRect = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number
+): void => {
+  ctx.fillStyle = getRandomColorString();
+  ctx.fillRect(x, y, width, height);
+};
