@@ -20,6 +20,9 @@ export const layerDataSlice = createSlice({
     setLayers: (state, action: PayloadAction<PsLayer[]>) => {
       state.layers = action.payload;
     },
+    setLastLayerId: (state, action: PayloadAction<number>) => {
+      state.lastLayerId = action.payload;
+    },
     addOneLayer: (
       state,
       action: PayloadAction<{
@@ -56,7 +59,7 @@ export const layerDataSlice = createSlice({
   },
 });
 
-export const { setLayers, addOneLayer, changeLayerData } =
+export const { setLayers, setLastLayerId, addOneLayer, changeLayerData } =
   layerDataSlice.actions;
 
 export const selectOneLayer = (state: RootState, id: number) =>

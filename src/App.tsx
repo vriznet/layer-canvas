@@ -5,6 +5,7 @@ import {
   changeLayerData,
   selectLastLayerId,
   selectLayers,
+  setLastLayerId,
   setLayers,
 } from './redux/module/layerDataSlice';
 import styled from 'styled-components';
@@ -69,6 +70,7 @@ const App = () => {
         targetIndex: layers.length,
       })
     );
+    dispatch(setLastLayerId(layerId));
   };
 
   const onNewRectShapeLayerButtonClick = () => {
@@ -79,6 +81,7 @@ const App = () => {
         targetIndex: layers.length,
       })
     );
+    dispatch(setLastLayerId(layerId));
     dispatch(
       changeLayerData({
         id: layerId,
@@ -98,6 +101,7 @@ const App = () => {
         targetIndex: layers.length,
       })
     );
+    dispatch(setLastLayerId(layerId));
     dispatch(
       changeLayerData({
         id: layerId,
