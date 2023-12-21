@@ -3,6 +3,7 @@ import { GlobalStyles } from './components/GlobalStyles';
 import {
   addOneLayer,
   changeLayerData,
+  deleteOneLayer,
   selectLayers,
   setLayers,
 } from './redux/module/layerDataSlice';
@@ -112,6 +113,10 @@ const App = () => {
     dispatch(setLayers(initialLayers));
   };
 
+  const onDeleteTopLayerButtonClick = () => {
+    dispatch(deleteOneLayer(layers.length));
+  };
+
   useEffect(() => {
     const loadAndRender = async () => {
       setIsImagesLoading(true);
@@ -196,6 +201,7 @@ const App = () => {
       <button onClick={onResetToDefaultLayersButtonClick}>
         Reset to default layers
       </button>
+      <button onClick={onDeleteTopLayerButtonClick}>Delete top layer</button>
     </>
   );
 };

@@ -51,10 +51,15 @@ export const layerDataSlice = createSlice({
       targetLayer.height = height || targetLayer.height;
       targetLayer.imageURL = imageURL || targetLayer.imageURL;
     },
+    deleteOneLayer: (state, action: PayloadAction<number>) => {
+      state.layers = state.layers.filter(
+        (layer) => layer.id !== action.payload
+      );
+    },
   },
 });
 
-export const { setLayers, addOneLayer, changeLayerData } =
+export const { setLayers, addOneLayer, changeLayerData, deleteOneLayer } =
   layerDataSlice.actions;
 
 export const selectOneLayer = (state: RootState, id: number) =>
