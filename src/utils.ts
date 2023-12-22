@@ -1,4 +1,4 @@
-import { PsLayer } from './types/layerData';
+import { PsLayer, PsLayerKind } from './types/layerData';
 
 export const loadImage = (url: string): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
@@ -20,6 +20,7 @@ export const createEmptyLayerData = (layerId: number): PsLayer => {
     y: 0,
     width: 0,
     height: 0,
+    layerKind: PsLayerKind.Pixel,
   };
 };
 

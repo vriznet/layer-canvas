@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { PsLayer } from '../../types/layerData';
+import { PsLayer, PsLayerKind } from '../../types/layerData';
 import { RootState } from '.';
 import { initialLayers } from '../../data/layerData';
 
@@ -45,6 +45,7 @@ export const layerDataSlice = createSlice({
         width?: number;
         height?: number;
         imageURL?: string;
+        layerKind?: PsLayerKind;
       }>
     ) => {
       const { id, x, y, width, height, imageURL } = action.payload;
@@ -55,6 +56,7 @@ export const layerDataSlice = createSlice({
       targetLayer.width = width || targetLayer.width;
       targetLayer.height = height || targetLayer.height;
       targetLayer.imageURL = imageURL || targetLayer.imageURL;
+      targetLayer.layerKind = action.payload.layerKind || targetLayer.layerKind;
     },
     deleteOneLayer: (state, action: PayloadAction<number>) => {
       state.layers = state.layers.filter(

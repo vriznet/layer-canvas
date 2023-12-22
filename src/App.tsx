@@ -18,6 +18,7 @@ import { createEmptyLayerData, getRandomColorString, loadImage } from './utils';
 import { initialLayers } from './data/layerData';
 import { Appearance } from './types/common';
 import { baseAppearance } from './data/common';
+import { PsLayerKind } from './types/layerData';
 // #endregion : imports
 
 // #region : types
@@ -182,6 +183,7 @@ const App = () => {
         y: Math.floor(Math.random() * 200),
         width: Math.floor(Math.random() * 300),
         height: Math.floor(Math.random() * 200),
+        layerKind: PsLayerKind.Shape,
       })
     );
   };
@@ -219,7 +221,12 @@ const App = () => {
   };
 
   const onDeleteIdOneAndTwoLayersButtonClick = () => {
-    dispatch(deleteLayers([1, 2]));
+    if (layers.find((layer) => layer.id === 1)) {
+      dispatch(deleteOneLayer(1));
+    }
+    if (layers.find((layer) => layer.id === 2)) {
+      dispatch(deleteOneLayer(2));
+    }
   };
 
   const onDeleteAllLayersButtonClick = () => {
@@ -232,7 +239,9 @@ const App = () => {
     const loadAndRender = async () => {
       /* setIsImagesLoading(true);
       const imageURLsAndLayerIds: ImageURLAndLayerId[] = []; */
-      const noImageLayers = layers.filter((layer) => !layer.imageURL);
+      const shapeLayers = layers.filter(
+        (layer) => layer.layerKind === PsLayerKind.Shape
+      );
       /* for (let i = 0; i < layers.length; i++) {
         const layer = layers[i];
         if (layer.imageURL) {
@@ -263,7 +272,7 @@ const App = () => {
           }
         }
       }); */
-      noImageLayers.forEach((layer) => {
+      shapeLayers.forEach((layer) => {
         if (layer.width && layer.height) {
           const canvas = document.getElementById(
             `layer-canvas-${layer.id}`
