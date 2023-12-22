@@ -6,7 +6,6 @@ import {
   changeLayerData,
   selectLastLayerId,
   deleteAllLayers,
-  deleteLayers,
   deleteOneLayer,
   selectLayers,
   setLastLayerId,
@@ -19,6 +18,7 @@ import { initialLayers } from './data/layerData';
 import { Appearance } from './types/common';
 import { baseAppearance } from './data/common';
 import { PsLayerKind } from './types/layerData';
+import { SubmitHandler, useForm } from 'react-hook-form';
 // #endregion : imports
 
 // #region : types
@@ -43,6 +43,10 @@ interface IRectBlueprintSCProps {
 type ImageURLAndLayerId = {
   imageURL: string;
   layerId: number;
+};
+
+type LayerListCheckboxInput = {
+  selectedLayerIds: string[];
 };
 // #endregion : types
 
@@ -86,6 +90,14 @@ const RectBlueprintSC = styled.div.attrs<IRectBlueprintSCProps>((props) => ({
   background-color: transparent;
   border: 1px solid #37f;
 `;
+
+const FormSC = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`;
+
+const LayerListSC = styled.ul``;
 // #endregion : styled components
 
 const App = () => {
@@ -106,6 +118,15 @@ const App = () => {
   // #region : refs
   const layerCanvasContainerRef = useRef<HTMLDivElement>(null);
   // #endregion : refs
+
+  // #region : hook form
+  const { register, handleSubmit, watch, setValue } =
+    useForm<LayerListCheckboxInput>({
+      defaultValues: {
+        selectedLayerIds: [],
+      },
+    });
+  // #endregion : hook form
 
   // #region : handlers
   const onCanvasAreaPointerDown: PointerEventHandler = (event) => {
@@ -145,6 +166,7 @@ const App = () => {
           y: pointedCoords.y - layerCanvasContainerBoundingRect.top,
           width: deltaX,
           height: deltaY,
+          layerKind: PsLayerKind.Shape,
         })
       );
       setRectBluePrintAppearance(baseAppearance);
@@ -216,24 +238,44 @@ const App = () => {
   const onDeleteTopLayerButtonClick = () => {
     const topLayer = layers[layers.length - 1];
     if (topLayer) {
+      const currentSelectedLayerIds = watch('selectedLayerIds');
+      setValue(
+        'selectedLayerIds',
+        currentSelectedLayerIds.filter((id) => id !== `${topLayer.id}`)
+      );
       dispatch(deleteOneLayer(topLayer.id));
     }
   };
 
   const onDeleteIdOneAndTwoLayersButtonClick = () => {
     if (layers.find((layer) => layer.id === 1)) {
+      const currentSelectedLayerIds = watch('selectedLayerIds');
+      setValue(
+        'selectedLayerIds',
+        currentSelectedLayerIds.filter((id) => id !== '1')
+      );
       dispatch(deleteOneLayer(1));
     }
     if (layers.find((layer) => layer.id === 2)) {
+      const currentSelectedLayerIds = watch('selectedLayerIds');
+      setValue(
+        'selectedLayerIds',
+        currentSelectedLayerIds.filter((id) => id !== '2')
+      );
       dispatch(deleteOneLayer(2));
     }
   };
 
   const onDeleteAllLayersButtonClick = () => {
+    setValue('selectedLayerIds', []);
     dispatch(deleteAllLayers());
   };
+
+  const onSubmit: SubmitHandler<LayerListCheckboxInput> = (data) =>
+    console.log(data);
   // #endregion : handlers
 
+  console.log(watch('selectedLayerIds'));
   // #region : effects
   useEffect(() => {
     const loadAndRender = async () => {
@@ -333,7 +375,28 @@ const App = () => {
         $width={rectBluePrintAppearance.width}
         $height={rectBluePrintAppearance.height}
         $zIndex={rectBluePrintAppearance.zIndex}
-      ></RectBlueprintSC>
+      />
+      <FormSC onSubmit={handleSubmit(onSubmit)}>
+        <LayerListSC>
+          {layers
+            .slice()
+            .reverse()
+            .map((layer) => (
+              <li key={layer.id}>
+                <input
+                  type="checkbox"
+                  id={`layer-item-${layer.id}`}
+                  value={layer.id}
+                  {...register('selectedLayerIds')}
+                />
+                <label htmlFor={`layer-item-${layer.id}`}>
+                  Layer {layer.id}
+                </label>
+              </li>
+            ))}
+        </LayerListSC>
+        <input type="submit" />
+      </FormSC>
     </>
   );
 };
