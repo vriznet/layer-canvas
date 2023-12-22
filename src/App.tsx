@@ -10,6 +10,7 @@ import {
   selectLayers,
   setLastLayerId,
   setLayers,
+  deleteLayers,
 } from './redux/module/layerDataSlice';
 import styled from 'styled-components';
 import { PointerEventHandler, useEffect, useRef, useState } from 'react';
@@ -239,43 +240,29 @@ const App = () => {
     const topLayer = layers[layers.length - 1];
     if (topLayer) {
       const currentSelectedLayerIds = watch('selectedLayerIds');
+      dispatch(deleteOneLayer(topLayer.id));
       setValue(
         'selectedLayerIds',
         currentSelectedLayerIds.filter((id) => id !== `${topLayer.id}`)
       );
-      dispatch(deleteOneLayer(topLayer.id));
     }
   };
 
-  const onDeleteIdOneAndTwoLayersButtonClick = () => {
-    if (layers.find((layer) => layer.id === 1)) {
-      const currentSelectedLayerIds = watch('selectedLayerIds');
-      setValue(
-        'selectedLayerIds',
-        currentSelectedLayerIds.filter((id) => id !== '1')
-      );
-      dispatch(deleteOneLayer(1));
-    }
-    if (layers.find((layer) => layer.id === 2)) {
-      const currentSelectedLayerIds = watch('selectedLayerIds');
-      setValue(
-        'selectedLayerIds',
-        currentSelectedLayerIds.filter((id) => id !== '2')
-      );
-      dispatch(deleteOneLayer(2));
-    }
+  const onDeleteSelectedLayersButtonClick = () => {
+    const currentSelectedLayerIds = watch('selectedLayerIds');
+    dispatch(deleteLayers(currentSelectedLayerIds.map((id) => +id)));
+    setValue('selectedLayerIds', []);
   };
 
   const onDeleteAllLayersButtonClick = () => {
-    setValue('selectedLayerIds', []);
     dispatch(deleteAllLayers());
+    setValue('selectedLayerIds', []);
   };
 
   const onSubmit: SubmitHandler<LayerListCheckboxInput> = (data) =>
     console.log(data);
   // #endregion : handlers
 
-  console.log(watch('selectedLayerIds'));
   // #region : effects
   useEffect(() => {
     const loadAndRender = async () => {
@@ -365,8 +352,8 @@ const App = () => {
         Reset to default layers
       </button>
       <button onClick={onDeleteTopLayerButtonClick}>Delete top layer</button>
-      <button onClick={onDeleteIdOneAndTwoLayersButtonClick}>
-        Delete layers with ids 1 and 2
+      <button onClick={onDeleteSelectedLayersButtonClick}>
+        Delete selected layers
       </button>
       <button onClick={onDeleteAllLayersButtonClick}>Delete all layers</button>
       <RectBlueprintSC
